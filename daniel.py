@@ -31,6 +31,7 @@ def exploit_rstr(r,rstr, infos):
 def get_score(ratio, dist):
   score = pow(ratio, 1+dist[0]*dist[1])
   return score
+
 def filter_desc(desc, l_rsc):
   out = []
   for ss, dis_list, distances in desc:
@@ -68,6 +69,7 @@ def analyze(string, ressource):
   zones = zoning(string)
   dis_infos = get_desc(zones, ressource["diseases"])
   events = []
+  loc_infos = []
   if len(dis_infos)>0:
     loc_infos = get_desc(zones, ressource["locations"])
     if len(loc_infos)==0:
@@ -76,7 +78,8 @@ def analyze(string, ressource):
       loc = loc_infos[0][1]
     for dis in dis_infos[:1]:
       events.append([dis[1], loc])
-  return events
+  dic_out = {"events":events, "dis_infos":dis_infos, "loc_infos":loc_infos}
+  return dic_out
 
 def get_ressource(lg):
   dic = {}
@@ -107,8 +110,8 @@ def get_clean_html(path, language):
 def process(language, document_path):
   string = get_clean_html(document_path, language)
   ressource = get_ressource(language)
-  result = analyze(string, ressource)
-  return result
+  results = analyze(string, ressource)
+  return results
 
 if __name__=="__main__":
   try:
@@ -121,5 +124,8 @@ if __name__=="__main__":
   print "="*20
   language = sys.argv[1]
   document_path = sys.argv[2]
-  result = process(language, document_path)
-  print result
+  results = process(language, document_path)
+  for key, val in results.iteritems():
+    print key
+    for v in val:
+      print "  %s"%v

@@ -34,5 +34,5 @@ else:
       lg_iso = infos["language"]
       if lg_iso in dic_lg:
         lg = dic_lg[lg_iso]
-    res = process(lg, infos["path"])
-    print id_file, res
+    results = process(lg, infos["path"])
+    print id_file, results["events"]
