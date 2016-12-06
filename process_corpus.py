@@ -2,6 +2,7 @@ from daniel import process
 import glob
 import sys
 import json
+import os
 
 def translate_justext():
 #TODO: add json ressource
@@ -14,6 +15,10 @@ if len(sys.argv)!=2:
   print "for information about the format for daniel, see README.txt"
   print "="*20
 else:
+  try:
+    os.makedirs("tmp")
+  except:
+    pass
   path_json = sys.argv[1]
   try:
     json = json.load(open(path_json))
