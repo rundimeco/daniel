@@ -32,18 +32,21 @@ def get_score(ratio, dist):
   score = pow(ratio, 1+dist[0]*dist[1])
   return score
 
-def filter_desc(desc, l_rsc):
+def filter_desc(desc, l_rsc, loc=False):
   out = []
   for ss, dis_list, distances in desc:
     for id_dis in dis_list:
       disease_name = l_rsc[id_dis]
       ratio = float(len(ss))/len(disease_name)
-      if ratio<0.7:continue
+      if ss[0]!=disease_name[0]:
+        if loc==True:continue
+        else:ratio=ratio-0.1
+      if ratio<0.8:continue
       score = get_score(ratio, distances)
       out.append([score, disease_name, ss, distances])
   return sorted(out,reverse=True)
 
-def get_desc(string, rsc):
+def get_desc(string, rsc, loc = False):
   set_id_text = set()
   rstr = Rstr_max()
   cpt = 0
@@ -57,7 +60,7 @@ def get_desc(string, rsc):
   r = rstr.go()
   infos ={"set_id_text" : set_id_text}
   desc = exploit_rstr(r,rstr, infos)
-  res = filter_desc(desc, l_rsc)
+  res = filter_desc(desc, l_rsc, loc)
   return res 
 
 def zoning(string):
@@ -71,7 +74,7 @@ def analyze(string, ressource):
   events = []
   loc_infos = []
   if len(dis_infos)>0:
-    loc_infos = get_desc(zones, ressource["locations"])
+    loc_infos = get_desc(zones, ressource["locations"], True)
     if len(loc_infos)==0:
       loc = ressource["locations"]["default_value"]
     else:
@@ -95,7 +98,9 @@ def open_utf8(path):
   f.close()
   return string
 
-def get_clean_html(path, language):
+def get_clean_html(path, language, is_clean):
+  if is_clean == True:
+    return open_utf8(path)
   try:
     tmp = "tmp/out"
     os.system("rm %s"%tmp)
@@ -107,8 +112,8 @@ def get_clean_html(path, language):
     out = open_utf8(path)
   return out
   
-def process(language, document_path):
-  string = get_clean_html(document_path, language)
+def process(language, document_path, is_clean=False):
+  string = get_clean_html(document_path, language, is_clean)
   ressource = get_ressource(language)
   results = analyze(string, ressource)
   return results
