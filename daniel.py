@@ -76,20 +76,33 @@ def analyze(string, ressource):
   if len(dis_infos)>0:
     loc_infos = get_desc(zones, ressource["locations"], True)
     if len(loc_infos)==0:
-      loc = ressource["locations"]["default_value"]
+      loc = [ressource["locations"]["default_value"]]
     else:
-      loc = loc_infos[0][1]
+      loc = [loc_infos[0][1]]
+    town_infos = get_desc(zones, ressource["towns"], True)
+    if len(town_infos)>0:
+      for t in town_infos:
+        loc.append((t[1], t[0]))
     for dis in dis_infos[:1]:
       events.append([dis[1], loc])
   dic_out = {"events":events, "dis_infos":dis_infos, "loc_infos":loc_infos}
   return dic_out
 
+def get_towns(path):
+  liste = eval(open_utf8(path))
+  dic = {}
+  for town, pop, region in liste:
+    dic[town] = [pop, region]
+  return dic
+
 def get_ressource(lg):
   dic = {}
   path_diseases = "ressources/diseases_%s.json"%lg
   path_locations= "ressources/locations_%s.json"%lg
+  path_towns= "ressources/towns_%s.json"%lg
   dic["locations"] = eval(open_utf8(path_locations))
   dic["diseases"] = eval(open_utf8(path_diseases))
+  dic["towns"] = get_towns(path_towns)
   return dic
 
 def open_utf8(path):
