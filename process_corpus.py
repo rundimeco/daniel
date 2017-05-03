@@ -12,9 +12,12 @@ def get_args():
                   help="JSON file for the corpus to process", metavar="CORPUS")
   parser.add_option("-l", "--language", dest="language", default ="fr",
                   help="Language to process")
-  parser.add_option("-b", "--boilerplate", dest="boilerplate", default =False, action ="store_true",
+  parser.add_option("-b", "--boilerplate", dest="boilerplate", 
+                  default =False, action ="store_true", 
                   help="if set, boilerplate removal will be performed")
-  parser.add_option("-e", "--evaluate", action="store_true", dest="evaluate", default=False,      help = "Perform Evaluation")
+  parser.add_option("-e", "--evaluate", dest="evaluate", 
+                  default=False, action="store_true",      
+                  help = "Perform Evaluation")
   (options, args) = parser.parse_args()
   return options
 
@@ -31,19 +34,23 @@ def  write_output(output_dic, options):
   wfi.close()
   return output_path
 
+def get_lg(infos):
+  dic_lg = translate_justext()
+  lg = "unknown"
+  if "language" in infos:
+    lg_iso = infos["language"]
+    if lg_iso in dic_lg:
+      lg = dic_lg[lg_iso]
+  return lg
+
 def  start_detection(options):
   corpus_to_process = json.load(open(options.corpus))
-  dic_lg = translate_justext()
   cpt = 0
   output_dic = {}
   for id_file, infos in corpus_to_process.iteritems():
-    cpt+=1
-    lg = "unknown"
     output_dic[id_file] = infos
-    if "language" in infos:
-      lg_iso = infos["language"]
-      if lg_iso in dic_lg:
-        lg = dic_lg[lg_iso]
+    cpt+=1
+    lg = get_lg(infos)
     results = process(lg, infos["path"], options.boilerplate)
     if len(results["events"])>0:
       print id_file, results["events"]
