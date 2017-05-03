@@ -138,7 +138,7 @@ if __name__=="__main__":
     pass
   print "="*20
   print "Usage : argv[1]=language argv[2]=document_path"
-  print "example:\n python daniel_v5.py Indonesian some_document_in_indonesian.html"
+  print "example:\n python daniel.py Indonesian some_document_in_indonesian.html"
   print "="*20
   language = sys.argv[1]
   document_path = sys.argv[2]
