@@ -109,11 +109,7 @@ def get_ressource(lg):
     dic["towns"] = get_towns(path_towns)
   except:
     print "Ressource '%s' not found"%path_towns
-    dic["towns"]=[]
-#  path_diseases = "ressources/diseases_%s.json"%lg
-#  path_locations= "ressources/locations_%s.json"%lg
-#  dic["locations"] = eval(open_utf8(path_locations))
-#  dic["diseases"] = eval(open_utf8(path_diseases))
+    dic["towns"]={}
   return dic
 
 def open_utf8(path):
