@@ -97,12 +97,23 @@ def get_towns(path):
 
 def get_ressource(lg):
   dic = {}
-  path_diseases = "ressources/diseases_%s.json"%lg
-  path_locations= "ressources/locations_%s.json"%lg
-  path_towns= "ressources/towns_%s.json"%lg
-  dic["locations"] = eval(open_utf8(path_locations))
-  dic["diseases"] = eval(open_utf8(path_diseases))
-  dic["towns"] = get_towns(path_towns)
+  for rsc_type in ["diseases", "locations"]:
+    try:
+      path = "ressources/%s_%s.json"%(rsc_type, lg)
+      dic[rsc_type] = eval(open_utf8(path))
+    except:
+      print "Ressource '%s' not found\n ->exiting"%path
+      exit()
+  try:
+    path_towns= "ressources/towns_%s.json"%lg
+    dic["towns"] = get_towns(path_towns)
+  except:
+    print "Ressource '%s' not found"%path_towns
+    dic["towns"]=[]
+#  path_diseases = "ressources/diseases_%s.json"%lg
+#  path_locations= "ressources/locations_%s.json"%lg
+#  dic["locations"] = eval(open_utf8(path_locations))
+#  dic["diseases"] = eval(open_utf8(path_diseases))
   return dic
 
 def open_utf8(path):
@@ -120,12 +131,14 @@ def get_clean_html(path, language, is_clean):
     cmd = "python -m justext -s %s %s >tmp/out"%(language, path)
     os.system(cmd)
     out = open_utf8(tmp)
-  except:
+  except:#to improve
     print "Justext is missing"
     out = open_utf8(path)
   return out
   
 def process(language, document_path, is_clean=False):
+  # language is used to find the ressources
+  # if is_clean is set True, justext will be used to extarct the textual content from raw html/xml file
   string = get_clean_html(document_path, language, is_clean)
   ressource = get_ressource(language)
   results = analyze(string, ressource)
@@ -142,7 +155,7 @@ if __name__=="__main__":
   print "="*20
   language = sys.argv[1]
   document_path = sys.argv[2]
-  results = process(language, document_path)
+  results = process(language, document_path, is_clean = False)
   for key, val in results.iteritems():
     print key
     for v in val:
