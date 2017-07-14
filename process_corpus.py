@@ -22,8 +22,7 @@ def get_args():
   return options
 
 def translate_justext():
-#TODO: add json ressource
-  dic= {"id": "Indonesian"}
+  dic= eval(open("ressources/language_codes.json").read()
   return dic
 
 def  write_output(output_dic, options):

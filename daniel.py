@@ -9,6 +9,7 @@ sys.path.append('./rstr_max')
 from tools_karkkainen_sanders import *
 from rstr_max import *
 import os
+from tools import *
 
 def exploit_rstr(r,rstr, infos):
   set_id_text = infos["set_id_text"]
@@ -132,26 +133,17 @@ def get_clean_html(path, language, is_clean):
     out = open_utf8(path)
   return out
   
-def process(language, document_path, is_clean=False):
-  # language is used to find the ressources
-  # if is_clean is set True, justext will be used to extarct the textual content from raw html/xml file
-  string = get_clean_html(document_path, language, is_clean)
-  ressource = get_ressource(language)
+def process(o):
+  string = get_clean_html(o.document_path, o.language, o.is_clean)
+  ressource = get_ressource(o.language)
   results = analyze(string, ressource)
   return results
 
 if __name__=="__main__":
-  try:
-    os.makedirs("tmp")
-  except:
-    pass
-  print "="*20
-  print "Usage : argv[1]=language argv[2]=document_path"
-  print "example:\n python daniel.py Indonesian some_document_in_indonesian.html"
-  print "="*20
-  language = sys.argv[1]
-  document_path = sys.argv[2]
-  results = process(language, document_path, is_clean = False)
+  options = get_args()
+  try: os.makedirs("tmp")
+  except: pass
+  results = process(options)
   for key, val in results.iteritems():
     print key
     for v in val:
