@@ -4,25 +4,14 @@ import sys
 import json
 import os
 import time
+from tools import get_args
 
-def get_args():
-  from optparse import OptionParser
-  parser = OptionParser()
-  parser.add_option("-c", "--corpus", dest="corpus",
-                  help="JSON file for the corpus to process", metavar="CORPUS")
-  parser.add_option("-l", "--language", dest="language", default ="fr",
-                  help="Language to process")
-  parser.add_option("-b", "--boilerplate", dest="boilerplate", 
-                  default =False, action ="store_true", 
-                  help="if set, boilerplate removal will be performed")
-  parser.add_option("-e", "--evaluate", dest="evaluate", 
-                  default=False, action="store_true",      
-                  help = "Perform Evaluation")
-  (options, args) = parser.parse_args()
-  return options
+class Struct:
+  def __init__(self, **entries):
+    self.__dict__.update(entries)
 
 def translate_justext():
-  dic= eval(open("ressources/language_codes.json").read()
+  dic= eval(open("ressources/language_codes.json").read())
   return dic
 
 def  write_output(output_dic, options):
@@ -48,9 +37,11 @@ def  start_detection(options):
   output_dic = {}
   for id_file, infos in corpus_to_process.iteritems():
     output_dic[id_file] = infos
+    infos["is_clean"] = options.is_clean
     cpt+=1
-    lg = get_lg(infos)
-    results = process(lg, infos["path"], options.boilerplate)
+    infos["language"] = get_lg(infos)
+    o = Struct(**infos)
+    results = process(o)
     if len(results["events"])>0:
       print id_file, results["events"]
       output_dic[id_file]["annotations"] = results["events"]
