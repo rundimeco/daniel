@@ -1,8 +1,8 @@
 [daniel.py]  For testing simple files
   Can be tested with the following command:
-    python daniel.py LANGUAGE FILE
+    python daniel.py -l LANGUAGE -d FILE
   Example :
-    python daniel.py Indonesian some_document_in_indonesian.html
+    python daniel.py -l Indonesian -d some_document_in_indonesian.html
 
 [process_corpus.py]  For processing a corpus :
   The command :

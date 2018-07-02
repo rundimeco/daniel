@@ -10,6 +10,7 @@ from tools_karkkainen_sanders import *
 from rstr_max import *
 import os
 from tools import *
+import justext
 
 def exploit_rstr(r,rstr, set_id_text):
   desc = []
@@ -57,7 +58,7 @@ def get_desc(string, rsc, loc = False):
     set_id_text.add(cpt)
     cpt+=1
   for r in l_rsc:
-    rstr.add_str(r)
+    rstr.add_str(r.decode("utf-8"))
   r = rstr.go()
   desc = exploit_rstr(r,rstr, set_id_text)
   res = filter_desc(desc, l_rsc, loc)
@@ -123,17 +124,19 @@ def get_clean_html(path, language, is_clean):
   if is_clean == True:
     return open_utf8(path)
   try:
-    tmp = "tmp/out"
-    os.system("rm %s"%tmp)
-    cmd = "python -m justext -s %s %s >tmp/out"%(language, path)
-    os.system(cmd)
-    out = open_utf8(tmp)
+    text = open_utf8(path)
+    paragraphs = justext.justext(text, justext.get_stoplist(language))
+    out = ""
+    for paragraph in paragraphs:
+      if not paragraph.is_boilerplate:
+        out+="<p>%s</p>\n"%paragraph.text
   except:#to improve
     print "Justext is missing"
     out = open_utf8(path)
   return out
   
 def process(o):
+  print o.document_path
   string = get_clean_html(o.document_path, o.language, o.is_clean)
   ressource = get_ressource(o.language)
   results = analyze(string, ressource, o)
@@ -145,7 +148,7 @@ if __name__=="__main__":
   except: pass
   results = process(options)
   ratio = float(options.ratio)
-  descriptions = eval(open("ressources/descriptions.json").read())
+  descriptions = eval(open_utf8("ressources/descriptions.json"))
   for key, val in results.iteritems():
     if val[0][0]<ratio:break
     print descriptions[key]

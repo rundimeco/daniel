@@ -4,14 +4,21 @@ import sys
 import json
 import os
 import time
+import codecs
 from tools import get_args
 
 class Struct:
   def __init__(self, **entries):
     self.__dict__.update(entries)
 
+def open_utf8(path):
+  f = codecs.open(path,"r", "utf-8")
+  chaine = f.read()
+  f.close()
+  return chaine
+
 def translate_justext():
-  dic= eval(open("ressources/language_codes.json").read())
+  dic= eval(open_utf8("ressources/language_codes.json"))
   return dic
 
 def  write_output(output_dic, options):
