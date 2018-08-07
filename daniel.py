@@ -86,7 +86,6 @@ def zoning(string):
   return z
 
 def analyze(string, ressource, options): 
-  print(options)
   zones = zoning(string)
   dis_infos = get_desc(zones, ressource["diseases"])
   events = []
@@ -122,17 +121,17 @@ def get_ressource(lg):
       try:
         dic[rsc_type] = eval(open_utf8(path))
       except Exception as e:
-        print "\nProblem with ressource %s :"%path
+        print "\n  Problem with ressource %s :"%path
         print e
         exit()
     else:
-      print "Ressource '%s' not found\n ->exiting"%path
+      print "  Ressource '%s' not found\n ->exiting"%path
       exit()
   try:
     path_towns= "ressources/towns_%s.json"%lg
     dic["towns"] = get_towns(path_towns)
   except:
-    print "Non manadtory ressource '%s' not found"%path_towns
+#    print "  Non mandatory ressource '%s' not found"%path_towns
     dic["towns"]={}
   return dic
 
@@ -154,12 +153,11 @@ def get_clean_html(path, language, is_clean):
       if not paragraph.is_boilerplate:
         out+="<p>%s</p>\n"%paragraph.text
   except:#to improve
-    print "Justext is missing, consider to install it: pip install justext"
+#    print "Justext is missing, to install it: pip install justext"
     out = open_utf8(path)
   return out
   
 def process(o):
-  print o.document_path
   string = get_clean_html(o.document_path, o.language, o.is_clean)
   ressource = get_ressource(o.language)
   results = analyze(string, ressource, o)

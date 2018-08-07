@@ -5,7 +5,7 @@ import json
 import os
 import time
 import codecs
-from tools import get_args
+from tools import *
 
 class Struct:
   def __init__(self, **entries):
@@ -42,18 +42,29 @@ def  start_detection(options):
   corpus_to_process = json.load(open(options.corpus))
   cpt = 0
   output_dic = {}
+  not_found = []
   for id_file, infos in corpus_to_process.iteritems():
     output_dic[id_file] = infos
     infos["is_clean"] = options.is_clean
-    cpt+=1
     infos["language"] = get_lg(infos)
     infos["ratio"] = options.ratio
+    if os.path.exists(infos["document_path"])==False:
+      not_found.append(infos["document_path"])
+      continue
+    cpt+=1
+    if cpt%100==0:
+      print "%s documents processed"%str(cpt)
     o = Struct(**infos)
     results = process(o)
     if len(results["events"])>0:
-      print id_file, results["events"]
+#      print id_file, results["events"]
       output_dic[id_file]["annotations"] = results["events"]
   output_path = write_output(output_dic, options)
+  if len(not_found)>0:
+    path_not_found = "tmp/files_not_found"
+    print "--\n %s files not found\n"%str(len(not_found))
+    print " list here : %s\n--"%(path_not_found)
+    write_utf8(path_not_found, "\n".join(not_found))
   return cpt, output_path
 
 if __name__=="__main__":
