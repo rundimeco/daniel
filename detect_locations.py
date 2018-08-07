@@ -102,7 +102,8 @@ def get_ressource(lg):
     try:
       path = "ressources/%s_%s.json"%(rsc_type, lg)
       dic[rsc_type] = eval(open_utf8(path))
-    except:
+    except Exception as e:
+      print e
       print "Ressource '%s' not found\n ->exiting"%path
       exit()
   try:
