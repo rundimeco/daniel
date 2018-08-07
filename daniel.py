@@ -157,17 +157,21 @@ def get_clean_html(path, language, is_clean):
     out = open_utf8(path)
   return out
   
-def process(o):
+def process(o, ressource = False, Filtered=True):
   string = get_clean_html(o.document_path, o.language, o.is_clean)
-  ressource = get_ressource(o.language)
+  if ressource ==False:
+    ressource = get_ressource(o.language)
   results = analyze(string, ressource, o)
+  if Filtered==True:
+    if results["dis_infos"][0][0]<o.ratio:
+      return {"events":[["N", "N", "N"]]}
   return results
 
 if __name__=="__main__":
   options = get_args()
   try: os.makedirs("tmp")
   except: pass
-  results = process(options)
+  results = process(options, filtered = False)
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
   for key, val in results.iteritems():

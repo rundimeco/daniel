@@ -6,6 +6,7 @@ import os
 import time
 import codecs
 from tools import *
+from daniel import get_ressource
 
 class Struct:
   def __init__(self, **entries):
@@ -40,32 +41,37 @@ def get_lg(infos):
 
 def  start_detection(options):
   corpus_to_process = json.load(open(options.corpus))
-  cpt = 0
-  output_dic = {}
+  cpt_proc, cpt_rel = 0, 0
+  output_dic, ressources = {}, {}
   not_found = []
   for id_file, infos in corpus_to_process.iteritems():
-    output_dic[id_file] = infos
-    infos["is_clean"] = options.is_clean
-    infos["language"] = get_lg(infos)
-    infos["ratio"] = options.ratio
     if os.path.exists(infos["document_path"])==False:
       not_found.append(infos["document_path"])
       continue
-    cpt+=1
-    if cpt%100==0:
-      print "%s documents processed"%str(cpt)
+    if "Elmoudjahid" not in infos["document_path"]:
+      continue
+    cpt_proc+=1
+    output_dic[id_file] = infos
+    infos["is_clean"] = options.is_clean
+    lg = get_lg(infos)
+    infos["language"] = lg
+    ressources.setdefault(lg, get_ressource(lg))
+    infos["ratio"] = options.ratio
     o = Struct(**infos)
-    results = process(o)
+    results = process(o, ressources[lg])
     if len(results["events"])>0:
-#      print id_file, results["events"]
-      output_dic[id_file]["annotations"] = results["events"]
+      cpt_rel +=1
+    output_dic[id_file]["annotations"] = results["events"]
+    output_dic[id_file]["is_clean"] = str(output_dic[id_file]["is_clean"])
+    if cpt_proc%100==0:
+      print "%s documents proc, %s rel"%(str(cpt_proc), str(cpt_rel))
   output_path = write_output(output_dic, options)
   if len(not_found)>0:
     path_not_found = "tmp/files_not_found"
     print "--\n %s files not found\n"%str(len(not_found))
     print " list here : %s\n--"%(path_not_found)
     write_utf8(path_not_found, "\n".join(not_found))
-  return cpt, output_path
+  return cpt_proc, cpt_rel, output_path
 
 if __name__=="__main__":
   start = time.clock()
@@ -79,10 +85,13 @@ if __name__=="__main__":
     os.makedirs("tmp")
   except:
     pass
-  cpt_doc, output_path = start_detection(options)
+  cpt_doc, cpt_rel, output_path = start_detection(options)
   end = time.clock()
-  print "%s documents processed in %s seconds"%(str(cpt_doc), str(end-start))
+  print "%s documents processed in %s seconds"%(str(cpt_doc), str(round(end-start, 4)))
+  print "  %s relevant documents"%(str(cpt_rel))
   print "  Results written in %s"%output_path
   if options.evaluate==True:
-    print "\nEvaluation\n"
-    os.system("python evaluate.py %s %s"%(options.corpus, output_path))
+    print "\nEvaluation\n :"
+    cmd = "python evaluate.py %s %s"%(options.corpus, output_path)
+    print "-->",cmd
+    os.system(cmd)

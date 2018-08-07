@@ -8,13 +8,13 @@ def get_dic(path):
   return dic
 
 def get_verdict(GT, EV):
-  if len(GT)>0:
-    if len(EV)>0:
+  if GT[0][0]!="N":
+    if EV[0][0]!="N":
       verdict = "TP"
     else:
       verdict = "FN"
   else:
-    if len(EV)>0:
+    if EV[0][0]!="N":
       verdict = "FP"
     else:
       verdict = "TN"
@@ -33,7 +33,7 @@ def get_measures(dic, beta=1):
 def get_results(dic_GT, dic_eval):
   dic_results = {x:0 for x in ["TP","FP","FN","TN"]}
   dic_results["Missing_GT"] = []
-  for id_doc, infos in dic_eval.iteritems():
+  for id_doc, infos in dic_eval.items():
     annot_eval = infos["annotations"]
     if id_doc in dic_GT:
       annot_GT = dic_GT[id_doc]["annotations"]  
@@ -41,11 +41,12 @@ def get_results(dic_GT, dic_eval):
       dic_results[verdict]+=1
     else:
       dic_results["Missing_GT"].append(id_doc)
-  print get_measures(dic_results)
-  print "  %s annotations missing"%str(len(dic_results["Missing_GT"]))
+    print(annot_GT, annot_eval)
+  print(get_measures(dic_results))
+  print("  %s annotations missing"%str(len(dic_results["Missing_GT"])))
 
 if len(sys.argv)!=3:
-  print "USAGE : arg1=groundtruth file arg2 = result file"
+  print("USAGE : arg1=groundtruth file arg2 = result file")
   exit()
 
 groundtruth_path = sys.argv[1]
