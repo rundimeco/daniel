@@ -47,6 +47,7 @@ def  start_detection(options):
     infos["is_clean"] = options.is_clean
     cpt+=1
     infos["language"] = get_lg(infos)
+    infos["ratio"] = options.ratio
     o = Struct(**infos)
     results = process(o)
     if len(results["events"])>0:
@@ -60,7 +61,8 @@ if __name__=="__main__":
   options = get_args()
   print options
   if options.corpus==None:
-    print "Please specify a Json file (-c option), see README.txt for more informations about the format"
+    print "Please specify a Json file (-c option), see README.txt for more informations about the format. To use the default example :"
+    print "-c docs/Indonesian_GL.json"
     exit()
   try:
     os.makedirs("tmp")

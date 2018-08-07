@@ -69,6 +69,7 @@ def zoning(string):
   return z
 
 def analyze(string, ressource, options): 
+  print(options)
   zones = zoning(string)
   dis_infos = get_desc(zones, ressource["diseases"])
   events = []
