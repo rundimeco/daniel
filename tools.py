@@ -7,7 +7,7 @@ def get_args():
   # Options specific to classif
   parser.add_option("-c", "--corpus", dest="corpus",
                   help="JSON file for the corpus to process", metavar="CORPUS")
-  parser.add_option("-d", "--document_path", dest="document_path",
+  parser.add_option("-d", "--document_path", dest="document_path", default="docs/id/DemamKongo",
                   help="Document to process")
   parser.add_option("-e", "--evaluate", dest="evaluate", 
                   default=False, action="store_true",      

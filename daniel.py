@@ -10,7 +10,6 @@ from tools_karkkainen_sanders import *
 from rstr_max import *
 import os
 from tools import *
-import justext
 
 def exploit_rstr(r,rstr, set_id_text):
   desc = []
@@ -124,6 +123,7 @@ def get_clean_html(path, language, is_clean):
   if is_clean == True:
     return open_utf8(path)
   try:
+    import justext
     text = open_utf8(path)
     paragraphs = justext.justext(text, justext.get_stoplist(language))
     out = ""
