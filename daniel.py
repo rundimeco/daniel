@@ -152,20 +152,24 @@ def get_lg_JT(lg_iso):
     lg = dic_lg[lg_iso]
   return lg
 
-def get_clean_html(path, language, is_clean):
-  if is_clean == True:
-    return open_utf8(path)
+def get_clean_html(o, lg_JT):
+  print "toto"
+  if o.is_clean == True:
+    return open_utf8(o.document_path)
   try:
     import justext
-    text = open_utf8(path)
+    text = open_utf8(o.document_path)
     paragraphs = justext.justext(text, justext.get_stoplist(language))
     out = ""
     for paragraph in paragraphs:
       if not paragraph.is_boilerplate:
         out+="<p>%s</p>\n"%paragraph.text
+    if o.verbose==True:
+      print "-> Document cleaned"
   except:#to improve
-#    print "Justext is missing, to install it: pip install justext"
-    out = open_utf8(path)
+    if o.verbose==True:
+      print "Justext is missing, to install it: pip install justext"
+    out = open_utf8(o.document_path)
   return out
   
 def process(o, ressource = False, filtered=True):
@@ -174,7 +178,7 @@ def process(o, ressource = False, filtered=True):
   except:
     lg_iso="unknown"
   lg_JT = get_lg_JT(lg_iso)
-  string = get_clean_html(o.document_path, lg_JT, o.is_clean)
+  string = get_clean_html(o, lg_JT)
   if ressource ==False:
     ressource = get_ressource(o.language)
   results = analyze(string, ressource, o)
