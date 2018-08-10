@@ -141,6 +141,17 @@ def open_utf8(path):
   f.close()
   return string
 
+def translate_justext():
+  dic= eval(open_utf8("ressources/language_codes.json"))
+  return dic
+
+def get_lg_JT(lg_iso):
+  dic_lg = translate_justext()
+  lg = "unknown"
+  if lg_iso in dic_lg:
+    lg = dic_lg[lg_iso]
+  return lg
+
 def get_clean_html(path, language, is_clean):
   if is_clean == True:
     return open_utf8(path)
@@ -157,12 +168,17 @@ def get_clean_html(path, language, is_clean):
     out = open_utf8(path)
   return out
   
-def process(o, ressource = False, Filtered=True):
-  string = get_clean_html(o.document_path, o.language, o.is_clean)
+def process(o, ressource = False, filtered=True):
+  try:
+    lg_iso = o.language
+  except:
+    lg_iso="unknown"
+  lg_JT = get_lg_JT(lg_iso)
+  string = get_clean_html(o.document_path, lg_JT, o.is_clean)
   if ressource ==False:
     ressource = get_ressource(o.language)
   results = analyze(string, ressource, o)
-  if Filtered==True:
+  if filtered==True:
     if results["dis_infos"][0][0]<o.ratio:
       return {"events":[["N", "N", "N"]]}
   return results
@@ -171,7 +187,7 @@ if __name__=="__main__":
   options = get_args()
   try: os.makedirs("tmp")
   except: pass
-  results = process(options, filtered = False)
+  results = process(options, ressource = False, filtered = False)
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
   for key, val in results.iteritems():

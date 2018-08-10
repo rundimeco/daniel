@@ -18,10 +18,6 @@ def open_utf8(path):
   f.close()
   return chaine
 
-def translate_justext():
-  dic= eval(open_utf8("ressources/language_codes.json"))
-  return dic
-
 def  write_output(output_dic, options):
   output_path = "%s.results"%options.corpus
   output_json = json.dumps(output_dic, sort_keys=True, indent=2)
@@ -30,14 +26,6 @@ def  write_output(output_dic, options):
   wfi.close()
   return output_path
 
-def get_lg(infos):
-  dic_lg = translate_justext()
-  lg = "unknown"
-  if "language" in infos:
-    lg_iso = infos["language"]
-    if lg_iso in dic_lg:
-      lg = dic_lg[lg_iso]
-  return lg
 
 def  start_detection(options):
   corpus_to_process = json.load(open(options.corpus))
@@ -53,8 +41,8 @@ def  start_detection(options):
     cpt_proc+=1
     output_dic[id_file] = infos
     infos["is_clean"] = options.is_clean
-    lg = get_lg(infos)
-    infos["language"] = lg
+#    infos["lg_JT"] = get_lg_JT(infos)
+    lg = infos["language"]
     ressources.setdefault(lg, get_ressource(lg))
     infos["ratio"] = options.ratio
     o = Struct(**infos)
