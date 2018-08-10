@@ -6,7 +6,7 @@ import os
 import time
 import codecs
 from tools import *
-from daniel import get_ressource
+from daniel import get_ressource, process_results
 
 class Struct:
   def __init__(self, **entries):
@@ -26,6 +26,12 @@ def  write_output(output_dic, options):
   wfi.close()
   return output_path
 
+def prepare_infos(infos, options):
+  infos["is_clean"] = options.is_clean
+  infos["ratio"] = options.ratio
+  infos["verbose"] = options.verbose
+  infos["debug"] = options.debug
+  return infos
 
 def  start_detection(options):
   corpus_to_process = json.load(open(options.corpus))
@@ -36,17 +42,17 @@ def  start_detection(options):
     if os.path.exists(infos["document_path"])==False:
       not_found.append(infos["document_path"])
       continue
-    if "Elmoudjahid" not in infos["document_path"]:
-      continue
     cpt_proc+=1
     output_dic[id_file] = infos
-    infos["is_clean"] = options.is_clean
-#    infos["lg_JT"] = get_lg_JT(infos)
+    infos = prepare_infos(infos, options)
+    if options.verbose==True:
+      print infos
     lg = infos["language"]
-    ressources.setdefault(lg, get_ressource(lg))
-    infos["ratio"] = options.ratio
+    ressources.setdefault(lg, get_ressource(options))
     o = Struct(**infos)
     results = process(o, ressources[lg])
+    if o.verbose==True:
+      process_results(results, o)
     if len(results["events"])>0:
       cpt_rel +=1
     output_dic[id_file]["annotations"] = results["events"]

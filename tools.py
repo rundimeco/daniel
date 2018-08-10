@@ -14,8 +14,8 @@ def get_args():
                   help = "Perform Evaluation")
   parser.add_option("-i", "--is_clean", dest="is_clean",
                     action = "store_true", default=False, help="If activated, no boilerplate removal will be applied (e.g. the document will processed as it is)")
-  parser.add_option("-l", "--language", dest="language", default ="Indonesian",
-                  help="Language to process (in plain text or in 2 letters)")
+  parser.add_option("-l", "--language", dest="language", default ="id",
+                  help="Language to process (ISO 639 2 letters)")
   parser.add_option("-o", "--out", dest="name_out",
                     default = "test_", help="Name of out file")
   parser.add_option("-r", "--ratio", dest="ratio", 
@@ -24,6 +24,9 @@ def get_args():
   parser.add_option("-v", "--verbose",
                    action="store_true", dest="verbose", default=False,
                    help="don't print status messages to stdout")
+  parser.add_option("-D", "--debug",
+                   action="store_true", dest="debug", default=False,
+                   help="print debug information")
 
 
   (options, args) = parser.parse_args()

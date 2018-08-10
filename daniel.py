@@ -51,7 +51,7 @@ def filter_desc(desc, l_rsc, loc=False):
         if loc==True:
           continue#for country names the first character should not change
         else:
-          ratio = ratio-0.1#penalty
+          ratio = max(0, ratio-0.1)#penalty
       score = get_score(ratio, distances)
       out.append([score, disease_name, ss, distances])
   return sorted(out,reverse=True)
@@ -88,6 +88,8 @@ def zoning(string):
 def analyze(string, ressource, options): 
   zones = zoning(string)
   dis_infos = get_desc(zones, ressource["diseases"])
+  if options.debug==True:
+    print dis_infos[:10]
   events = []
   loc_infos = []
   if len(dis_infos)>0:
@@ -113,7 +115,8 @@ def get_towns(path):
     dic[town] = [pop, region]
   return dic
 
-def get_ressource(lg):
+def get_ressource(o):
+  lg = o.language
   dic = {}
   for rsc_type in ["diseases", "locations"]:
     path = "ressources/%s_%s.json"%(rsc_type, lg)
@@ -131,7 +134,8 @@ def get_ressource(lg):
     path_towns= "ressources/towns_%s.json"%lg
     dic["towns"] = get_towns(path_towns)
   except:
-#    print "  Non mandatory ressource '%s' not found"%path_towns
+    if o.verbose==True:
+      print "  Non mandatory ressource '%s' not found"%path_towns
     dic["towns"]={}
   return dic
 
@@ -153,22 +157,22 @@ def get_lg_JT(lg_iso):
   return lg
 
 def get_clean_html(o, lg_JT):
-  print "toto"
   if o.is_clean == True:
     return open_utf8(o.document_path)
   try:
     import justext
     text = open_utf8(o.document_path)
-    paragraphs = justext.justext(text, justext.get_stoplist(language))
+    paragraphs = justext.justext(text, justext.get_stoplist(lg_JT))
     out = ""
     for paragraph in paragraphs:
       if not paragraph.is_boilerplate:
         out+="<p>%s</p>\n"%paragraph.text
     if o.verbose==True:
       print "-> Document cleaned"
-  except:#to improve
+  except Exception as e:
     if o.verbose==True:
-      print "Justext is missing, to install it: pip install justext"
+      print e
+      print "** Probably Justext is missing, do 'pip install justext'"
     out = open_utf8(o.document_path)
   return out
   
@@ -180,23 +184,30 @@ def process(o, ressource = False, filtered=True):
   lg_JT = get_lg_JT(lg_iso)
   string = get_clean_html(o, lg_JT)
   if ressource ==False:
-    ressource = get_ressource(o.language)
+    ressource = get_ressource(o)
   results = analyze(string, ressource, o)
   if filtered==True:
+    if len(results["dis_infos"])==0:
+      return {"events":[["N", "N", "N"]]}
     if results["dis_infos"][0][0]<o.ratio:
       return {"events":[["N", "N", "N"]]}
   return results
 
-if __name__=="__main__":
-  options = get_args()
-  try: os.makedirs("tmp")
-  except: pass
-  results = process(options, ressource = False, filtered = False)
+def  process_results(results, options):
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
+  print "-"*10, "RESULTS", "-"*10
   for key, val in results.iteritems():
     if val[0][0]<ratio:break
     print descriptions[key]
     for v in val:
       if v[0]<ratio:break
       print "  %s"%v
+  print "-"*30
+
+if __name__=="__main__":
+  options = get_args()
+  try: os.makedirs("tmp")
+  except: pass
+  results = process(options, ressource = False, filtered = False)
+  process_results(results, options)
