@@ -38,11 +38,23 @@ def  start_detection(options):
   cpt_proc, cpt_rel = 0, 0
   output_dic, ressources = {}, {}
   not_found = []
+  has_not_found = False
+  abs_path = ""
   for id_file, infos in corpus_to_process.iteritems():
     if os.path.exists(infos["document_path"])==False:
-      not_found.append(infos["document_path"])
-      continue
+      abs_path = os.path.dirname(os.path.abspath(options.corpus))+"/"
+      if os.path.exists(abs_path + infos["document_path"])==False:
+        not_found.append(infos["document_path"])
+        if has_not_found==False:
+          print "Not found : ",infos["document_path"]
+          print "Not found either: ",abs_path+infos["document_path"]
+          print "  -> the next not found files will be ignored"
+          d = raw_input("Press enter to continue")
+          has_not_found = True
+        continue
     cpt_proc+=1
+    if abs_path!="":
+      infos["document_path"]=abs_path+infos["document_path"]
     output_dic[id_file] = infos
     infos = prepare_infos(infos, options)
     if options.verbose==True:
