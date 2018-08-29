@@ -127,7 +127,7 @@ def get_towns(path):
 
 def get_ressource(lg, o):
   dic = {}
-  mandatory_res = ["diseases", "locations"]
+  mandatory_rsc = ["diseases", "locations"]
   for rsc_type in ["diseases", "locations", "sources"]:
     path = "ressources/%s_%s.json"%(rsc_type, lg)
     if os.path.exists(path)==True:
