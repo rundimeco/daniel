@@ -1,9 +1,11 @@
 import re
 import sys
+import json
 
 def get_dic(path):
+  print(path)
   f = open(path)
-  dic = eval(f.read())
+  dic = json.load(f)
   f.close()
   return dic
 
@@ -41,7 +43,10 @@ def get_results(dic_GT, dic_eval):
       dic_results[verdict]+=1
     else:
       dic_results["Missing_GT"].append(id_doc)
-    print(annot_GT, annot_eval)
+    if "T" not in verdict:
+      print(annot_GT, annot_eval)
+  if dic_results["TP"]+dic_results["FN"]==0:
+    print("  No relevant documents in this Ground Truth")
   print(get_measures(dic_results))
   print("  %s annotations missing"%str(len(dic_results["Missing_GT"])))
 

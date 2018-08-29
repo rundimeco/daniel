@@ -85,6 +85,16 @@ def zoning(string):
     z = [" ".join(x) for x in z]
   return z
 
+def get_implicit_location(ressource, options):
+  loc = ressource["locations"]["default_value"]
+  try:
+    source = options.source
+    if source in ressource["sources"]:
+      loc = ressource["sources"][source]
+  except:
+    pass
+  return loc
+
 def analyze(string, ressource, options): 
   zones = zoning(string)
   dis_infos = get_desc(zones, ressource["diseases"])
@@ -94,10 +104,10 @@ def analyze(string, ressource, options):
   loc_infos = []
   if len(dis_infos)>0:
     loc_infos = get_desc(zones, ressource["locations"], True)
-    if len(loc_infos)==0:
-      loc = [ressource["locations"]["default_value"]]
+    if len(loc_infos)==0 or loc_infos[0][0]<0.5:
+      loc =  get_implicit_location(ressource, options)
     else:
-      loc = [loc_infos[0][1]]
+      loc = loc_infos[0][1]
     town_infos = get_desc(zones, ressource["towns"], True)
     if len(town_infos)>0:
       for t in town_infos:
@@ -115,18 +125,21 @@ def get_towns(path):
     dic[town] = [pop, region]
   return dic
 
-def get_ressource(o):
-  lg = o.language
+def get_ressource(lg, o):
   dic = {}
-  for rsc_type in ["diseases", "locations"]:
+  mandatory_res = ["diseases", "locations"]
+  for rsc_type in ["diseases", "locations", "sources"]:
     path = "ressources/%s_%s.json"%(rsc_type, lg)
     if os.path.exists(path)==True:
       try:
         dic[rsc_type] = eval(open_utf8(path))
       except Exception as e:
-        print "\n  Problem with ressource %s :"%path
-        print e
-        exit()
+        if rsc_type in mandatory_rsc:
+          print "\n  Problem with ressource %s :"%path
+          print e
+          exit()
+        else:
+          dic[rsc_type] = {}
     else:
       print "  Ressource '%s' not found\n ->exiting"%path
       exit()
@@ -139,7 +152,7 @@ def get_ressource(o):
     dic["towns"]={}
   return dic
 
-def open_utf8(path):
+def open_utf8(path, struct=False):
   f = codecs.open(path,"r", "utf-8")
   string = f.read()
   f.close()
@@ -184,25 +197,31 @@ def process(o, ressource = False, filtered=True):
   lg_JT = get_lg_JT(lg_iso)
   string = get_clean_html(o, lg_JT)
   if ressource ==False:
-    ressource = get_ressource(o)
+    ressource = get_ressource(lg_iso, o)
   results = analyze(string, ressource, o)
   if filtered==True:
+    results["dis_infos"] = [x for x in results["dis_infos"] if x[0]>=o.ratio]
+    results["loc_infos"] = [x for x in results["loc_infos"] if x[0]>=o.ratio]
     if len(results["dis_infos"])==0:
       return {"events":[["N", "N", "N"]]}
-    if results["dis_infos"][0][0]<o.ratio:
-      return {"events":[["N", "N", "N"]]}
+    return results
   return results
 
 def  process_results(results, options):
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
   print "-"*10, "RESULTS", "-"*10
-  for key, val in results.iteritems():
-    if val[0][0]<ratio:break
-    print descriptions[key]
-    for v in val:
-      if v[0]<ratio:break
-      print "  %s"%v
+  print(descriptions["events"])
+  for event in results["events"]:
+    print("  "+str(event))
+  if "dis_infos" not in results:
+    return
+  for info in ["dis_infos", "loc_infos"]:
+    print(descriptions[info])
+    for elems in results[info]:
+      if elems[0]<options.ratio:
+        break
+      print "  %s"%elems
   print "-"*30
 
 if __name__=="__main__":

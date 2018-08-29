@@ -40,6 +40,7 @@ def  start_detection(options):
   not_found = []
   has_not_found = False
   abs_path = ""
+  print "\n Processing %s documents\n"%str(len(corpus_to_process))
   for id_file, infos in corpus_to_process.iteritems():
     if os.path.exists(infos["document_path"])==False:
       abs_path = os.path.dirname(os.path.abspath(options.corpus))+"/"
@@ -60,12 +61,12 @@ def  start_detection(options):
     if options.verbose==True:
       print infos
     lg = infos["language"]
-    ressources.setdefault(lg, get_ressource(options))
+    ressources.setdefault(lg, get_ressource(lg, options))
     o = Struct(**infos)
     results = process(o, ressources[lg])
     if o.verbose==True:
       process_results(results, o)
-    if len(results["events"])>0:
+    if "dis_infos" in results:
       cpt_rel +=1
     output_dic[id_file]["annotations"] = results["events"]
     output_dic[id_file]["is_clean"] = str(output_dic[id_file]["is_clean"])
@@ -87,6 +88,8 @@ if __name__=="__main__":
     print "Please specify a Json file (-c option), see README.txt for more informations about the format. To use the default example :"
     print "-c docs/Indonesian_GL.json"
     exit()
+  else:
+    options.document_path ="None"
   try:
     os.makedirs("tmp")
   except:
