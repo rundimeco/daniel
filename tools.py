@@ -19,7 +19,7 @@ def get_args():
   parser.add_option("-o", "--out", dest="name_out",
                     default = "test_", help="Name of out file")
   parser.add_option("-r", "--ratio", dest="ratio", 
-                  default =0.8, 
+                  default =0.8, type="float", 
                   help="Defines the threshold for the relative size of the substrings (e.g. 0.8 meaning that only the substring sharing 80% of the Named Entity will be considered.")
   parser.add_option("-v", "--verbose",
                    action="store_true", dest="verbose", default=False,

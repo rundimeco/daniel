@@ -61,7 +61,8 @@ def  start_detection(options):
     if options.verbose==True:
       print infos
     lg = infos["language"]
-    ressources.setdefault(lg, get_ressource(lg, options))
+    if lg not in ressources:
+      ressources[lg] = get_ressource(lg, options)
     o = Struct(**infos)
     results = process(o, ressources[lg])
     if o.verbose==True:

@@ -45,15 +45,17 @@ def filter_desc(desc, l_rsc, loc=False):
   out = []
   for ss, dis_list, distances in desc:
     for id_dis in dis_list:
-      disease_name = l_rsc[id_dis]
-      ratio = float(len(ss))/len(disease_name)
-      if ss[0]!=disease_name[0]:
+      entity_name = l_rsc[id_dis]
+      ratio = float(len(ss))/len(entity_name.decode("utf-8"))
+      if ss[0].lower()!=entity_name[0].lower():
         if loc==True:
-          continue#for country names the first character should not change
+          #for country names the first character should not change
+          ratio = max(0, ratio-0.2)#penalty
         else:
-          ratio = max(0, ratio-0.1)#penalty
+          if len(entity_name.decode("utf-8"))<6:
+            ratio = max(0, ratio-0.1)#penalty
       score = get_score(ratio, distances)
-      out.append([score, disease_name, ss, distances])
+      out.append([score, entity_name, ss, distances])
   return sorted(out,reverse=True)
 
 def get_desc(string, rsc, loc = False):
@@ -72,17 +74,26 @@ def get_desc(string, rsc, loc = False):
   res = filter_desc(desc, l_rsc, loc)
   return res 
 
-def zoning(string):
+def zoning(string, options):
   z = re.split("<p>", string)
   if len(z)==1:
     z = re.split("\n", string)
   z = [x for x in z if x!=""]
-  if len(z)<3:#insufficient structure
-    sentences = re.split("\. ", string)
-    if len(sentences)<5:
-      return z
-    z = [sentences[:2],sentences[2:-3],sentences[-3:]]
-    z = [" ".join(x) for x in z]
+  if len(z)<3:#insufficient paragraph/linebreaks structure
+    sentences = re.split("\. |\</p>", string)
+    sentences = [x for x in sentences if len(x)>2]
+    if len(sentences)<5:#very short article
+      z = [string]
+    elif len(z)==2:#Title may have been extracted
+      part = int(len(z[1])/2)
+      z = [z[0], z[1][:part], z[1][part:]]
+    else:#No usable structure
+      part = int(len(string)/3)
+      z = [string[:part], string[part:part*2], string[part*2:]] 
+  if options.debug ==True:
+    for zone in z:
+      print re.sub("\n", "--",zone[:100])
+    d = raw_input("Zoning ended, proceed to next step ?")
   return z
 
 def get_implicit_location(ressource, options):
@@ -96,14 +107,17 @@ def get_implicit_location(ressource, options):
   return loc
 
 def analyze(string, ressource, options): 
-  zones = zoning(string)
+  zones = zoning(string, options)
   dis_infos = get_desc(zones, ressource["diseases"])
   if options.debug==True:
     print dis_infos[:10]
+    d = raw_input("10 first entities displayed, proceed to next step ?")
   events = []
   loc_infos = []
   if len(dis_infos)>0:
     loc_infos = get_desc(zones, ressource["locations"], True)
+    if options.debug==True:
+      print loc_infos[:10]
     if len(loc_infos)==0 or loc_infos[0][0]<0.5:
       loc =  get_implicit_location(ressource, options)
     else:
@@ -152,13 +166,13 @@ def get_ressource(lg, o):
     dic["towns"]={}
   return dic
 
-def open_utf8(path, struct=False):
+def open_utf8(path):
   f = codecs.open(path,"r", "utf-8")
   string = f.read()
   f.close()
   return string
 
-def translate_justext():
+def translate_justext():#TODO: with big corpus, getting it only once
   dic= eval(open_utf8("ressources/language_codes.json"))
   return dic
 

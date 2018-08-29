@@ -43,10 +43,13 @@ def get_results(dic_GT, dic_eval):
       dic_results[verdict]+=1
     else:
       dic_results["Missing_GT"].append(id_doc)
-    if "T" not in verdict:
+    if verdict=="FN":
       print(annot_GT, annot_eval)
+      print(infos["document_path"])
+      print("")
   if dic_results["TP"]+dic_results["FN"]==0:
     print("  No relevant documents in this Ground Truth")
+  print(dic_results)
   print(get_measures(dic_results))
   print("  %s annotations missing"%str(len(dic_results["Missing_GT"])))
 
