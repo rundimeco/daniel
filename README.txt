@@ -2,7 +2,7 @@
   Can be tested with the following command:
     python daniel.py -l LANGUAGE -d FILE
   Example :
-    python daniel.py -l Indonesian -d some_document_in_indonesian.html
+    python daniel.py -l id -d some_document_in_indonesian.html
 
 [process_corpus.py]  For processing a corpus :
   The command :
