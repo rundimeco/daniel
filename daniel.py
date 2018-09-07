@@ -46,14 +46,14 @@ def filter_desc(desc, l_rsc, loc=False):
   out = []
   for ss, dis_list, distances in desc:
     for id_dis in dis_list:
-      entity_name = l_rsc[id_dis]
-      ratio = float(len(ss))/len(entity_name.decode("utf-8"))
+      entity_name = l_rsc[id_dis].decode("utf-8")
+      ratio = float(len(ss))/len(entity_name)
       if ss[0].lower()!=entity_name[0].lower():
         if loc==True:
           #for country names the first character should not change
           ratio = max(0, ratio-0.2)#penalty
         else:
-          if len(entity_name.decode("utf-8"))<6:
+          if len(entity_name)<6:
             ratio = max(0, ratio-0.1)#penalty
       score = get_score(ratio, distances)
       out.append([score, entity_name, ss, distances])
