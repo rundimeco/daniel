@@ -10,6 +10,7 @@ from tools_karkkainen_sanders import *
 from rstr_max import *
 import os
 from tools import *
+import json
 
 def get_normalized_pos(ss, text):
   s = re.escape(ss)
@@ -230,16 +231,23 @@ def  process_results(results, options):
     print("  "+str(event))
   if "dis_infos" not in results:
     return
+  res_filtered = {}
   for info in ["dis_infos", "loc_infos"]:
+    res_filtered[info] = []
     print(descriptions[info])
     for elems in results[info]:
       if elems[0]<options.ratio:
         break
+      res_filtered[info].append(elems)
       print "  %s"%elems
+  w = codecs.open(options.name_out, "w", "utf-8")
+  w.write(json.dumps(res_filtered))
+  w.close()
   print "-"*30
 
 if __name__=="__main__":
   options = get_args()
+  print(options)
   try: os.makedirs("tmp")
   except: pass
   results = process(options, ressource = False, filtered = False)
