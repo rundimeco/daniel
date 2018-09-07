@@ -225,25 +225,30 @@ def process(o, ressource = False, filtered=True):
 def  process_results(results, options):
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
-  print "-"*10, "RESULTS", "-"*10
-  print(descriptions["events"])
-  for event in results["events"]:
-    print("  "+str(event))
+  if options.verbose==True:
+    print "-"*10, "RESULTS", "-"*10
+    print(descriptions["events"])
+    for event in results["events"]:
+      print("  "+str(event))
   if "dis_infos" not in results:
     return
   res_filtered = {}
   for info in ["dis_infos", "loc_infos"]:
     res_filtered[info] = []
-    print(descriptions[info])
+    if options.verbose==True:
+      print(descriptions[info])
     for elems in results[info]:
       if elems[0]<options.ratio:
         break
       res_filtered[info].append(elems)
-      print "  %s"%elems
+      if options.verbose==True:
+        print "  %s"%elems
   w = codecs.open(options.name_out, "w", "utf-8")
   w.write(json.dumps(res_filtered))
   w.close()
-  print "-"*30
+
+  if options.verbose==True:
+    print "-"*30
 
 if __name__=="__main__":
   options = get_args()
