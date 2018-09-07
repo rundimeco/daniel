@@ -252,7 +252,6 @@ def  process_results(results, options):
 
 if __name__=="__main__":
   options = get_args()
-  print(options)
   try: os.makedirs("tmp")
   except: pass
   results = process(options, ressource = False, filtered = False)
