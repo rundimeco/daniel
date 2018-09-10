@@ -156,13 +156,14 @@ def get_ressource(lg, o):
         else:
           dic[rsc_type] = {}
     else:
-      print "  Ressource '%s' not found\n ->exiting"%path
-      exit()
+      if rsc_type in mandatory_rsc:
+        print "  Ressource '%s' not found\n ->exiting"%path
+        exit()
   try:
     path_towns= "ressources/towns_%s.json"%lg
     dic["towns"] = get_towns(path_towns)
   except:
-    if o.verbose==True:
+    if o.debug==True:
       print "  Non mandatory ressource '%s' not found"%path_towns
     dic["towns"]={}
   return dic
@@ -225,30 +226,38 @@ def process(o, ressource = False, filtered=True):
 def  process_results(results, options):
   ratio = float(options.ratio)
   descriptions = eval(open_utf8("ressources/descriptions.json"))
-  if options.verbose==True:
+  if options.debug==True:
     print "-"*10, "RESULTS", "-"*10
     print(descriptions["events"])
     for event in results["events"]:
-      print("  "+str(event))
+      print("  "+" ".join(event))
   if "dis_infos" not in results:
     return
   res_filtered = {}
   for info in ["dis_infos", "loc_infos"]:
     res_filtered[info] = []
-    if options.verbose==True:
-      print(descriptions[info])
+    if len(results["dis_infos"])==0:
+      break
+    if results["dis_infos"][0][0]<options.ratio:
+      break
     for elems in results[info]:
       if elems[0]<options.ratio:
         break
       res_filtered[info].append(elems)
       if options.verbose==True:
-        print "  %s"%elems
+        print(descriptions[info])
+      if options.verbose==True:
+        for e in elems:
+          print e,
+#        print "  %s"%" ".join(elems)
+        print("")
+      print("-"*10)
   w = codecs.open(options.name_out, "w", "utf-8")
   w.write(json.dumps(res_filtered))
   w.close()
 
-  if options.verbose==True:
-    print "-"*30
+#  if options.verbose==True:
+#    print "-"*30
 
 if __name__=="__main__":
   options = get_args()
