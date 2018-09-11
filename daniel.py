@@ -205,13 +205,14 @@ def get_clean_html(o, lg_JT):
     out = open_utf8(o.document_path)
   return out
   
-def process(o, ressource = False, filtered=True):
+def process(o, ressource = False, filtered=True, process_res = True, string = False):
   try:
     lg_iso = o.language
   except:
     lg_iso="unknown"
   lg_JT = get_lg_JT(lg_iso)
-  string = get_clean_html(o, lg_JT)
+  if string == False:
+    string = get_clean_html(o, lg_JT)
   if ressource ==False:
     ressource = get_ressource(lg_iso, o)
   results = analyze(string, ressource, o)
@@ -221,6 +222,8 @@ def process(o, ressource = False, filtered=True):
     if len(results["dis_infos"])==0:
       return {"events":[["N", "N", "N"]]}
     return results
+  if process_res == True:
+    process_results(results, options)
   return results
 
 def  process_results(results, options):
@@ -263,5 +266,4 @@ if __name__=="__main__":
   options = get_args()
   try: os.makedirs("tmp")
   except: pass
-  results = process(options, ressource = False, filtered = False)
-  process_results(results, options)
+  results = process(options, ressource = False, filtered = False, process_res=True)
