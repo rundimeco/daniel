@@ -44,7 +44,7 @@ def get_results(dic_GT, dic_eval):
     else:
       dic_results["Missing_GT"].append(id_doc)
     if verdict=="FN":
-      print(annot_GT, annot_eval)
+      print(infos["language"],annot_GT, annot_eval)
       print(infos["document_path"])
       print("")
   if dic_results["TP"]+dic_results["FN"]==0:
