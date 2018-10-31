@@ -15,7 +15,7 @@ NOTES:
     python process_corpus.py -c JSON_FILE
       NB: Needs a JSON file  (see below for the format)
   Example :
-     python2.7 process_corpus.py -c docs/Indonesian_GL.json -v
+     python2.7 process_corpus.py -c docs/Indonesian_GL.json
 
 [evaluate.py] For evaluating results
   Compares the content of a groundtruth JSON file and an output from daniel
