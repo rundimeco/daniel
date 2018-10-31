@@ -1,8 +1,9 @@
 NOTES:
 - The core algorithm of Daniel still being coded in Python2.7, you will have to change the commands below if Python3.x is your default version
 - Using the pypy compiler usually makes Daniel 10 times faster (see https://pypy.org/download.html and choose the appropriate Python2.7 version)
+- On a standard laptop, in standard conditions for temperature and pressure, Daniel processes around 100 documents/second with the pypy2 compiler, around 10 with the Python2.7 compiler
 
-On a standard laptop in standard conditions for temperature and pressure, Daniel processes around 150 documents/second
+
 [daniel.py]  For testing simple files
   Can be tested with the following command (-v to print results on stdout):
     python daniel.py -l LANGUAGE -d FILE -v
