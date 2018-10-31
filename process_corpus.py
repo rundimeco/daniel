@@ -31,6 +31,7 @@ def prepare_infos(infos, options):
   infos["ratio"] = options.ratio
   infos["verbose"] = options.verbose
   infos["debug"] = options.debug
+  infos["name_out"] = options.name_out
   return infos
 
 def  start_detection(options):
@@ -72,7 +73,7 @@ def  start_detection(options):
     output_dic[id_file]["annotations"] = results["events"]
     output_dic[id_file]["is_clean"] = str(output_dic[id_file]["is_clean"])
     if cpt_proc%100==0:
-      print "%s documents proc, %s rel"%(str(cpt_proc), str(cpt_rel))
+      print "%s documents processed, %s relevant"%(str(cpt_proc), str(cpt_rel))
   output_path = write_output(output_dic, options)
   if len(not_found)>0:
     path_not_found = "tmp/files_not_found"
