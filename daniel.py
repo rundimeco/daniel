@@ -239,21 +239,20 @@ def  process_results(results, options):
   if "dis_infos" not in results:
     return
   res_filtered = {}
-  for info in ["dis_infos", "loc_infos"]:
-    res_filtered[info] = []
-    if len(results["dis_infos"])==0:
-      break
-    if results["dis_infos"][0][0]<options.ratio:
-      break
-    for elems in results[info]:
-      if elems[0]<options.ratio:
-        break
-      res_filtered[info].append(elems)
-      if options.verbose==True or options.showrelevant==True:
-        print options.document_path
-        print(descriptions[info])
-        print(elems)
-        print("")
+  if len(results["dis_infos"])>0:
+    if results["dis_infos"][0][0]>=options.ratio:
+      for info in ["dis_infos", "loc_infos"]:
+        res_filtered[info] = []
+        for elems in results[info]:
+          if elems[0]<options.ratio:
+           break
+          res_filtered[info].append(elems)
+          if options.verbose==True or options.showrelevant==True:
+            print options.document_path
+            print(descriptions[info])
+            print(elems)
+            print(results["dis_infos"][0][1])
+            print("")
       print("-"*10)
   w = codecs.open(options.name_out, "w", "utf-8")
   w.write(json.dumps(res_filtered))
