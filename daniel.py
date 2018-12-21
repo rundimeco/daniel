@@ -250,8 +250,7 @@ def  process_results(results, options):
           if options.verbose==True or options.showrelevant==True:
             print options.document_path
             print(descriptions[info])
-            print(elems)
-            print(results["dis_infos"][0][1])
+            print(eval(str(elems)))
             print("")
       print("-"*10)
   w = codecs.open(options.name_out, "w", "utf-8")
