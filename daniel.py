@@ -29,12 +29,14 @@ def exploit_rstr(r,rstr, set_id_text):
       s_occur.add(id_str)
     inter = s_occur.intersection(set_id_text)
     has_inter = len(inter)>1 and len(s_occur)>len(inter)
-    if has_inter or weak_struct: 
+    weak_and_repeat=(weak_struct and 0 in s_occur)#needs to be in 1st paragraph
+    if has_inter or weak_and_repeat: 
       NE_ids=[x-len(set_id_text) for x in s_occur.difference(set_id_text)]
       if len(inter)>1:
         l_dist = [min(d, len(set_id_text)-d-1) for d in inter]
       else:
         l_dist = get_normalized_pos(ss, rstr.global_suffix)
+      l_dist = [round(x, 5) for x in l_dist]
       desc.append([ss, NE_ids, sorted(l_dist)])
   return desc
 
@@ -247,12 +249,10 @@ def  process_results(results, options):
       if elems[0]<options.ratio:
         break
       res_filtered[info].append(elems)
-      if options.verbose==True:
+      if options.verbose==True or options.showrelevant==True:
+        print options.document_path
         print(descriptions[info])
-      if options.verbose==True:
-        for e in elems:
-          print e,
-#        print "  %s"%" ".join(elems)
+        print(elems)
         print("")
       print("-"*10)
   w = codecs.open(options.name_out, "w", "utf-8")

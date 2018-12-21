@@ -20,15 +20,16 @@ def get_args():
                     default = "test.out", help="Name of out file")
   parser.add_option("-r", "--ratio", dest="ratio", 
                   default =0.8, type="float", 
-                  help="Defines the threshold for the relative size of the substrings (e.g. 0.8 meaning that only the substring sharing 80% of the Named Entity will be considered.")
+                  help="Defines the threshold for the relative size of the substrings (e.g. 0.8 meaning that substrings sharing 80% of the Named Entity will be considered.")
   parser.add_option("-v", "--verbose",
                    action="store_true", dest="verbose", default=False,
-                   help="don't print status messages to stdout")
+                   help="Show status messages to stdout")
+  parser.add_option("-s", "--showrelevant",
+                   action="store_true", dest="showrelevant", default=False,
+                   help="Show informations on files classified as relevant")
   parser.add_option("-D", "--debug",
                    action="store_true", dest="debug", default=False,
                    help="print debug information")
-
-
   (options, args) = parser.parse_args()
   return options
 

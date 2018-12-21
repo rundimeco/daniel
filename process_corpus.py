@@ -32,6 +32,7 @@ def prepare_infos(infos, options):
   infos["verbose"] = options.verbose
   infos["debug"] = options.debug
   infos["name_out"] = options.name_out
+  infos["showrelevant"] = options.showrelevant
   return infos
 
 def  start_detection(options):
@@ -66,7 +67,7 @@ def  start_detection(options):
       ressources[lg] = get_ressource(lg, options)
     o = Struct(**infos)
     results = process(o, ressources[lg])
-    if o.verbose==True:
+    if o.verbose==True or o.showrelevant==True:
       process_results(results, o)
     if "dis_infos" in results:
       cpt_rel +=1
@@ -87,8 +88,7 @@ if __name__=="__main__":
   options = get_args()
   print options
   if options.corpus==None:
-    print "Please specify a Json file (-c option), see README.txt for more informations about the format. To use the default example :"
-    print "-c docs/Indonesian_GL.json"
+    print "Please specify a Json file (-c), see README.txt for more informations about the format. To use the default example :\n -c docs/Indonesian_GL.json"
     exit()
   else:
     options.document_path ="None"
@@ -98,7 +98,7 @@ if __name__=="__main__":
     pass
   cpt_doc, cpt_rel, output_path = start_detection(options)
   end = time.clock()
-  print "%s documents processed in %s seconds"%(str(cpt_doc), str(round(end-start, 4)))
+  print "%s docs proc. in %s seconds"%(str(cpt_doc), str(round(end-start, 4)))
   print "  %s relevant documents"%(str(cpt_rel))
   print "  Results written in %s"%output_path
   if options.evaluate==True:
