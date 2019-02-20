@@ -5,6 +5,7 @@ import sys
 import os
 import re
 import glob
+import math
 sys.path.append('./rstr_max')
 from tools_karkkainen_sanders import *
 from rstr_max import *
@@ -33,7 +34,7 @@ def exploit_rstr(r,rstr, set_id_text):
     if has_inter or weak_and_repeat: 
       NE_ids=[x-len(set_id_text) for x in s_occur.difference(set_id_text)]
       if len(inter)>1:
-        l_dist = [min(d, len(set_id_text)-d-1) for d in inter]
+        l_dist = [min(pos, len(set_id_text)-pos-1) for pos in inter]
       else:
         l_dist = get_normalized_pos(ss, rstr.global_suffix)
       l_dist = [round(x, 5) for x in l_dist]
@@ -41,7 +42,14 @@ def exploit_rstr(r,rstr, set_id_text):
   return desc
 
 def get_score(ratio, dist):
-  score = pow(ratio, 1+dist[0]*dist[1])
+  if ratio ==1:
+    ratio = 0.99
+  if dist[0]==1:
+    return ratio
+  elif dist[1]<=1:
+    score = pow(ratio, 1+dist[0]*dist[1])
+  else:
+    score = pow(ratio, 1+dist[0]*math.log(dist[1]))
   return score
 
 def filter_desc(desc, l_rsc, loc=False):
@@ -55,7 +63,7 @@ def filter_desc(desc, l_rsc, loc=False):
           #for country names the first character should not change
           ratio = max(0, ratio-0.2)#penalty
         else:
-          if len(entity_name)<6:
+          if len(entity_name)<6 and ratio<1:
             ratio = max(0, ratio-0.1)#penalty
       score = get_score(ratio, distances)
       out.append([score, entity_name, ss, distances])
@@ -95,7 +103,8 @@ def zoning(string, options):
       z = [string[:part], string[part:part*2], string[part*2:]] 
   if options.debug ==True:
     for zone in z:
-      print re.sub("\n", "--",zone[:100])
+      print re.sub("\n", "--",zone[:70])
+      print("")
     d = raw_input("Zoning ended, proceed to next step ?")
   return z
 
@@ -113,8 +122,9 @@ def analyze(string, ressource, options):
   zones = zoning(string, options)
   dis_infos = get_desc(zones, ressource["diseases"])
   if options.debug==True:
-    print dis_infos[:10]
-    d = raw_input("10 first entities displayed, proceed to next step ?")
+    for res in dis_infos[:10]:
+      print "  ",round(res[0], 2)," \t", res[1], "\t", res[2]
+    d = raw_input(" first 10 entities displayed, proceed to next step ?")
   events = []
   loc_infos = []
   if len(dis_infos)>0:

@@ -1,6 +1,7 @@
 import re
 import sys
 import json
+import os
 
 def get_dic(path):
   print(path)
@@ -30,28 +31,35 @@ def get_measures(dic, beta=1):
   P = float(TP)/(TP+FP)
   B = beta*beta
   F = (1+B)*P*R/(B*P+R)
-  return {"Recall":R, "Precision":P, "F%s-measure"%str(beta):F}
+  return {"Recall":round(R,4), "Precision":round(P,4), "F%s-measure"%str(beta):round(F,4)}
 
 def get_results(dic_GT, dic_eval):
   dic_results = {x:0 for x in ["TP","FP","FN","TN"]}
+  dic_lg ={}
   dic_results["Missing_GT"] = []
   for id_doc, infos in dic_eval.items():
-    annot_eval = infos["annotations"]
+    lg = infos["language"]
+    dic_lg.setdefault(lg,{x:0 for x in ["TP","FP","FN","TN"]})
+    try:annot_eval = infos["annotations"]
+    except:continue
     if id_doc in dic_GT:
       annot_GT = dic_GT[id_doc]["annotations"]  
       verdict = get_verdict(annot_GT, annot_eval)#TODO: add events
       dic_results[verdict]+=1
+      dic_lg[lg][verdict]+=1
     else:
       dic_results["Missing_GT"].append(id_doc)
-    if verdict=="FN":
+    if verdict=="FP":
       print(infos["language"],annot_GT, annot_eval)
-      print(infos["document_path"])
-      print("")
+#      os.system("gedit %s"%infos["document_path"])
+#      dd = input("Next ?")
   if dic_results["TP"]+dic_results["FN"]==0:
     print("  No relevant documents in this Ground Truth")
   print(dic_results)
   print(get_measures(dic_results))
   print("  %s annotations missing"%str(len(dic_results["Missing_GT"])))
+  for lg , infos in dic_lg.items():
+    print(lg, get_measures(infos))
 
 if len(sys.argv)!=3:
   print("USAGE : arg1=groundtruth file arg2 = result file")

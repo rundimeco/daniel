@@ -59,6 +59,8 @@ def  start_detection(options):
     if abs_path!="":
       infos["document_path"]=abs_path+infos["document_path"]
     output_dic[id_file] = infos
+    if "annotations" in output_dic[id_file]:
+      del output_dic[id_file]["annotations"]# for evaluation
     infos = prepare_infos(infos, options)
     if options.verbose==True:
       print infos

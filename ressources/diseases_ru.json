@@ -64,6 +64,7 @@
 'Пневмония':'Pneumonia',
 'Бешенство':'Rabies',
 'Грипп':'Flu',
+'грипп':'Flu',
 'Чума':'Plague_(disease)',
 'Спленомегалия':'Splenomegaly',
 'Чесотка':'Scabies',

@@ -94,7 +94,10 @@
 'Chikungunya':'Chickengunya',
 'Tężec':'Tetanus',
 'Boliwijska gorączka krwotoczna':'Machupo',
+'gorączka krwotoczna':'Hemorragic Fever',
 'Limfocytarne zapalenie splotu naczyniówkowego i opon mózgowych':'Lymphocytic_choriomeningitis',
 'Gorączka Lassa':'Lassa_fever',
 'Kiła':'Syphilis',
+'Choroby układu oddechowego': 'respiratory disease',
+'EHEC':'E.coli'
 }

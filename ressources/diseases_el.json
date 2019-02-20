@@ -18,7 +18,7 @@
 'Μηνιγγίτιδα':'Meningitis',
 'Πνευμονία':'Pneumonia',
 'Λύσσα':'Rabies',
-'ρίπη':'Flu',
+'γρίπη':'Flu',
 'AIDS':'AIDS',
 'Πανώλη':'Plague_(disease)',
 'Σήψη':'Sepsis',
@@ -28,4 +28,6 @@
 'Κίτρινος πυρετός':'Yellow_fever',
 'Τέτανος':'Tetanus',
 'Σύφιλη':'Syphilis',
+'πνευμονοπάθεια': 'pulmonary disease',
+'πολιομυελίτιδας': 'poliomyelitis'
 }
