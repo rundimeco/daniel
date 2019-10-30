@@ -22,8 +22,8 @@ infos = {
     "debug":False,
     "name_out":"toto.out"
   }
-
+print(infos)
 o = Struct(**infos)
-
-results = process(o, string = text)
-print(results)
+print(o)
+result = process(o, string = text)
+print(result)

@@ -1,3 +1,7 @@
+-----
+ This Version is deprecated, thanks to Khoa Nguyen a new version in Python 3 is available : https://github.com/nnkhoa/daniel_v3
+-----
+
 NOTES:
 - The core algorithm of Daniel still being coded in Python2.7, you will have to change the commands below if Python3.x is your default version
 - Using the pypy compiler usually makes Daniel 10 times faster (see https://pypy.org/download.html and choose the appropriate Python2.7 version)

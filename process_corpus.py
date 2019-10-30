@@ -18,14 +18,6 @@ def open_utf8(path):
   f.close()
   return chaine
 
-def  write_output(output_dic, options):
-  output_path = "%s.results"%options.corpus
-  output_json = json.dumps(output_dic, sort_keys=True, indent=2)
-  wfi = open(output_path, "w")
-  wfi.write(output_json)
-  wfi.close()
-  return output_path
-
 def prepare_infos(infos, options):
   infos["is_clean"] = options.is_clean
   infos["ratio"] = options.ratio
@@ -44,6 +36,9 @@ def  start_detection(options):
   abs_path = ""
   print "\n Processing %s documents\n"%str(len(corpus_to_process))
   for id_file, infos in corpus_to_process.iteritems():
+    lg = infos["language"]
+    if options.language!="all":
+      if lg!=options.language:continue
     if os.path.exists(infos["document_path"])==False:
       abs_path = os.path.dirname(os.path.abspath(options.corpus))+"/"
       if os.path.exists(abs_path + infos["document_path"])==False:
@@ -75,8 +70,8 @@ def  start_detection(options):
       cpt_rel +=1
     output_dic[id_file]["annotations"] = results["events"]
     output_dic[id_file]["is_clean"] = str(output_dic[id_file]["is_clean"])
-    if cpt_proc%100==0:
-      print "%s documents processed, %s relevant"%(str(cpt_proc), str(cpt_rel))
+#    if cpt_proc%100==0:
+#      print "%s documents processed, %s relevant"%(str(cpt_proc), str(cpt_rel))
   output_path = write_output(output_dic, options)
   if len(not_found)>0:
     path_not_found = "tmp/files_not_found"
@@ -104,7 +99,6 @@ if __name__=="__main__":
   print "  %s relevant documents"%(str(cpt_rel))
   print "  Results written in %s"%output_path
   if options.evaluate==True:
-    print "\nEvaluation\n :"
     cmd = "python evaluate.py %s %s"%(options.corpus, output_path)
-    print "-->",cmd
+    print "\nEvaluation: %s VS %s"%(options.corpus, output_path)
     os.system(cmd)

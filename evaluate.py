@@ -4,7 +4,6 @@ import json
 import os
 
 def get_dic(path):
-  print(path)
   f = open(path)
   dic = json.load(f)
   f.close()
@@ -37,6 +36,7 @@ def get_results(dic_GT, dic_eval):
   dic_results = {x:0 for x in ["TP","FP","FN","TN"]}
   dic_lg ={}
   dic_results["Missing_GT"] = []
+  dic_errors = {}
   for id_doc, infos in dic_eval.items():
     lg = infos["language"]
     dic_lg.setdefault(lg,{x:0 for x in ["TP","FP","FN","TN"]})
@@ -50,16 +50,23 @@ def get_results(dic_GT, dic_eval):
     else:
       dic_results["Missing_GT"].append(id_doc)
     if verdict=="FP":
-      print(infos["language"],annot_GT, annot_eval)
+#      print(infos["language"],annot_GT, annot_eval)
+      dic_errors[id_doc] = infos
+      dic_errors[id_doc]["verdict"] = verdict
+      dic_errors[id_doc]["annot_GT"] = annot_GT
 #      os.system("gedit %s"%infos["document_path"])
 #      dd = input("Next ?")
   if dic_results["TP"]+dic_results["FN"]==0:
     print("  No relevant documents in this Ground Truth")
+  w = open("errors.json", "w")
+  w.write(json.dumps(dic_errors, indent = 2))
+  w.close()
   print(dic_results)
   print(get_measures(dic_results))
   print("  %s annotations missing"%str(len(dic_results["Missing_GT"])))
   for lg , infos in dic_lg.items():
     print(lg, get_measures(infos))
+  return dic_lg
 
 if len(sys.argv)!=3:
   print("USAGE : arg1=groundtruth file arg2 = result file")

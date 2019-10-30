@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import codecs
-import sys
-import os
+import codecs, sys, os
 import re
 import glob
 import math
@@ -50,6 +48,8 @@ def get_score(ratio, dist):
     score = pow(ratio, 1+dist[0]*dist[1])
   else:
     score = pow(ratio, 1+dist[0]*math.log(dist[1]))
+  if len(set(dist).intersection(set([0, 1])))==0:#not in headline:penalty
+    score-=0.1
   return score
 
 def filter_desc(desc, l_rsc, loc=False):
@@ -63,9 +63,10 @@ def filter_desc(desc, l_rsc, loc=False):
           #for country names the first character should not change
           ratio = max(0, ratio-0.2)#penalty
         else:
-          if len(entity_name)<6 and ratio<1:
-            ratio = max(0, ratio-0.1)#penalty
+          ratio = max(0, ratio-0.1)#penalty
       score = get_score(ratio, distances)
+#      if score>0.75 and loc==False:
+#        print([ss,ratio,score,distances])
       out.append([score, entity_name, ss, distances])
   return sorted(out,reverse=True)
 
@@ -86,27 +87,29 @@ def get_desc(string, rsc, loc = False):
   return res 
 
 def zoning(string, options):
-  z = re.split("<p>", string)
-  if len(z)==1:
-    z = re.split("\n", string)
-  z = [x for x in z if x!=""]
-  if len(z)<3:#insufficient paragraph/linebreaks structure
-    sentences = re.split("\. |\</p>", string)
-    sentences = [x for x in sentences if len(x)>2]
+  zones = re.split("<p>", string)
+  if len(zones)==1:
+    zones = re.split("\n", string)
+  zones = [x for x in zones if x!=""]
+  sentences = re.split("\. |\</p>", string)
+  sentences = [x for x in sentences if len(x)>2]
+  if len(zones)<3:#insufficient paragraph/linebreaks structure
     if len(sentences)<5:#very short article
-      z = [string]
-    elif len(z)==2:#Title may have been extracted
-      part = int(len(z[1])/2)
-      z = [z[0], z[1][:part], z[1][part:]]
+      zones = [string]
+    elif len(zones)==2:#Title may have been extracted
+      part = int(len(zones[1])/2)
+      zones = [zones[0], zones[1][:part], zones[1][part:]]
     else:#No usable structure
       part = int(len(string)/3)
-      z = [string[:part], string[part:part*2], string[part*2:]] 
+      zones = [string[:part], string[part:part*2], string[part*2:]]
+#  elif len(sentences)<1*len(zones):
+#    zones = [zones[0:3], zones[3:-2],zones[-2:]]
   if options.debug ==True:
-    for zone in z:
+    for zone in zones:
       print re.sub("\n", "--",zone[:70])
       print("")
     d = raw_input("Zoning ended, proceed to next step ?")
-  return z
+  return zones
 
 def get_implicit_location(ressource, options):
   loc = ressource["locations"]["default_value"]
@@ -272,6 +275,7 @@ def  process_results(results, options):
 
 if __name__=="__main__":
   options = get_args()
+  print("For processing a json file, use 'process_corpus.py'")
   try: os.makedirs("tmp")
   except: pass
   results = process(options, ressource = False, filtered = False, process_res=True)
